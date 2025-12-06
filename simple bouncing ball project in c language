@@ -1,23 +1,113 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
 
+#define MAX 50   // Maximum queue size
+
+// Queue structure
+typedef struct {
+    int arr[MAX];
+    int front, rear;
+} Queue;
+
+// Initialize queue
+void initQueue(Queue *q) {
+    q->front = -1;
+    q->rear = -1;
+}
+
+// Check if queue is empty
+bool isEmpty(Queue *q) {
+    return q->front == -1;
+}
+
+// Check if queue is full
+bool isFull(Queue *q) {
+    return q->rear == MAX - 1;
+}
+
+// Enqueue operation
+void enqueue(Queue *q, int customerID) {
+    if (isFull(q)) {
+        printf("Queue is full! Customer %d cannot wait.\n", customerID);
+        return;
+    }
+    if (isEmpty(q)) {
+        q->front = 0;
+    }
+    q->rear++;
+    q->arr[q->rear] = customerID;
+    printf("Customer %d joined the queue.\n", customerID);
+}
+
+// Dequeue operation (service)
+int dequeue(Queue *q) {
+    if (isEmpty(q)) {
+        printf("No customers in queue.\n");
+        return -1;
+    }
+    int served = q->arr[q->front];
+    if (q->front == q->rear) { // last element
+        q->front = q->rear = -1;
+    } else {
+        q->front++;
+    }
+    return served;
+}
+
+// Display queue
+void display(Queue *q) {
+    if (isEmpty(q)) {
+        printf("Queue is empty.\n");
+        return;
+    }
+    printf("Current Queue: ");
+    for (int i = q->front; i <= q->rear; i++) {
+        printf("%d ", q->arr[i]);
+    }
+    printf("\n");
+}
+
+// Main simulation
 int main() {
-    double height = 10.0;      // initial height (meters)
-    double velocity = 0.0;     // initial velocity
-    double g = -9.8;           // gravity (m/s^2)
-    double dt = 0.01;          // time step
-    double bounce = 0.7;       // energy lost on each bounce
+    Queue q;
+    initQueue(&q);
 
-    for (double t = 0; t < 5; t += dt) {
-        velocity += g * dt;     // update velocity
-        height += velocity * dt; // update height
-        
-        // Bounce condition
-        if (height <= 0) {
-            height = 0;
-            velocity = -velocity * bounce;  // reverse and reduce speed
+    int choice, id;
+
+    while (1) {
+        printf("\n===== BANK QUEUE SIMULATION =====\n");
+        printf("1. New Customer Arrives\n");
+        printf("2. Serve Customer\n");
+        printf("3. Display Waiting Queue\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter Customer ID: ");
+                scanf("%d", &id);
+                enqueue(&q, id);
+                break;
+
+            case 2:
+                id = dequeue(&q);
+                if (id != -1)
+                    printf("Customer %d is being served.\n", id);
+                break;
+
+            case 3:
+                display(&q);
+                break;
+
+            case 4:
+                printf("Simulation Ended.\n");
+                exit(0);
+
+            default:
+                printf("Invalid choice!\n");
         }
-
-        printf("t=%.2f s, height=%.2f m\n", t, height);
     }
 
     return 0;
